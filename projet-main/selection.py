@@ -12,7 +12,7 @@ pygame.display.set_caption("Choisissez la taille du plateau, le nombre de joueur
 
 # Défini les différentes tailles de plateau de jeu, le nombre de joueurs et le nombre de barrières
 board_sizes = ["5x5", "7x7", "9x9", "11x11"]
-num_players = ["2", "4"]
+num_players = ["2", "4", "IA"]
 num_barriers = list(range(4, 41, 4))  # Select multiples of 4 from 4 to 40
 
 # Configure la police d'écriture
@@ -45,10 +45,10 @@ barriers_rect_positions = [pygame.Rect(pos[0] - 10, pos[1] - 10, text.get_width(
 
 # Crée un bouton de validation
 validation_text = font.render("Valider", True, (255, 255, 255))
-validation_position = (TAILLE_ECRAN[0] // 2 - validation_text.get_width() // 2, TAILLE_ECRAN[1] - validation_text.get_height() - 150)
-validation_rect = pygame.Rect(validation_position[0] - 10, validation_position[1] - 10, validation_text.get_width() + 20, validation_text.get_height() + 20)
-
-
+validation_position = (
+TAILLE_ECRAN[0] // 2 - validation_text.get_width() // 2, TAILLE_ECRAN[1] - validation_text.get_height() - 150)
+validation_rect = pygame.Rect(validation_position[0] - 10, validation_position[1] - 10,
+                              validation_text.get_width() + 20, validation_text.get_height() + 20)
 # Variables pour stocker l'index sélectionné de chaque option
 selected_board_size_index = None
 selected_num_players_index = None
@@ -60,14 +60,42 @@ def is_clicked(rect, mouse_pos):
     return rect.collidepoint(mouse_pos)
 
 
+# Fonction pour lancer le jeu avec les paramètres sélectionnés
+def lancer_jeu():
+    # Vérifie si toutes les options sont sélectionnées
+    if (
+        selected_board_size_index is not None
+        and selected_num_players_index is not None
+        and selected_num_barriers_index is not None
+    ):
+        # Exécute le script correspondant en fonction du nombre de joueurs sélectionné
+        if num_players[selected_num_players_index] == "IA":
+            subprocess.call(
+                [
+                    "python",
+                    "game_ia.py",
+                    board_sizes[selected_board_size_index],
+                    str(num_barriers[selected_num_barriers_index]),
+                ]
+            )
+        else:
+            subprocess.call(
+                [
+                    "python",
+                    "game.py",
+                    board_sizes[selected_board_size_index],
+                    num_players[selected_num_players_index],
+                    str(num_barriers[selected_num_barriers_index]),
+                ]
+            )
+
+
 # Boucle principale du jeu
-running = True
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            break
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
 
@@ -88,11 +116,9 @@ while running:
 
             # Vérifie si le bouton de validation est cliqué
             if is_clicked(validation_rect, mouse_pos):
-                # Vérifie si toutes les options sont sélectionnées
-                if selected_board_size_index is not None and selected_num_players_index is not None and selected_num_barriers_index is not None:
-                    # Exécute le script "selection.py" avec les options sélectionnées
-                    subprocess.call(["python", "game.py", board_sizes[selected_board_size_index], num_players[selected_num_players_index], str(num_barriers[selected_num_barriers_index])])
-                    running = False
+                lancer_jeu()
+                running = False
+
 
     # Dessine la fenetre
     fenetre.fill((0, 0, 0))

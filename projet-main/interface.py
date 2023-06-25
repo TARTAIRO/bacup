@@ -56,7 +56,7 @@ texte_regles = "1- But du jeu :\n\nLe but du jeu est d'être le premier joueur �
 
 # Fonction pour lancer la fenêtre de jeu
 def lancer_jeu():
-    subprocess.call(["python", "selection.py"])  
+    subprocess.call(["python", "selection.py"])
 
 
 # Dans la boucle principale
